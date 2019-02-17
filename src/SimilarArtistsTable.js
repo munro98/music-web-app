@@ -5,7 +5,7 @@ import './App.css';
 
 // list of all possible enums in child
 const VIEW_CALLBACK_ENUMS = {
-    PLAY: 'SONG_TABLE/PLAY',
+    CLICK: 'SIMILAR_ARISTS/CLICK',
   };
 
 const divStyle = {
@@ -29,12 +29,12 @@ class SimilarArtistsTable extends Component {
     }
 
     onClickArtist(e) {
-        let id = e.currentTarget.getAttribute('song_id');
+        let id = e.currentTarget.getAttribute('artist_list_ind');
         console.log("play " + e.currentTarget + " "+ id);
 
 
         this.props.callbackHandler(
-            VIEW_CALLBACK_ENUMS.PLAY,
+            VIEW_CALLBACK_ENUMS.CLICK,
             {id : id});
     }
 
@@ -45,7 +45,7 @@ class SimilarArtistsTable extends Component {
         let items = list.map( (val, i) =>
             <tr key={i}>
                 <td>
-                <button id="play-button" style={stylePlayerButton} onClick={this.onClickArtist} song_id={i}>
+                <button id="play-button" style={stylePlayerButton} onClick={this.onClickArtist} artist_list_ind={i}>
                     <svg id="icon-skip-play" viewBox="0 0 24 24" width="100%" height="100%" style={{fill: "rgb(200, 200, 200)"}}>
                         <path d="M 17.488289,12 4.3498907,3.6967476 V 20.303252 Z"></path>
                         <path d="M0 0h24v24H0z" fill="none"></path>
@@ -53,11 +53,10 @@ class SimilarArtistsTable extends Component {
                 </button>
                 </td>
                 <td>{val.name + " " + i}</td>
-                <td><a href="www">{val.artists[0]}</a></td>
+                <td><a href="www">{val.name + " " + i}</a></td>
             </tr>
 
         );
-
         return (
             <div style={divStyle}>
             <table id="similar-artists">
@@ -77,21 +76,6 @@ class SimilarArtistsTable extends Component {
 }
 
 export default SimilarArtistsTable
-
 export {
     VIEW_CALLBACK_ENUMS as SONG_TABLE_CB_ENUMS,
   };
-/*
-
-infinte list
-
-onComponentDidMount
-
-data = select * from song limit 100 page 5
-
-data.map () {
-    make the table
-}
-
-
-*/
