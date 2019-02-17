@@ -7,6 +7,10 @@ import {
   SONG_TABLE_CB_ENUMS,
 } from './SongTable';
 
+import SimilarArtistsTable from './SimilarArtistsTable';
+import { 
+  SIMILAR_ARTISTS_TABLE_CB_ENUMS,
+} from './SimilarArtistsTable';
 
 const LFM_API = process.env.REACT_APP_LFM_API;
 
@@ -127,9 +131,8 @@ class App extends Component {
               <SongTable songs={this.state.artistTopSongs} callbackHandler={this.callbackHandler}></SongTable>
             </div>
             <div className="Similar">
-              <p>
-                Edit <code>src/App.js</code> and save to reload.
-              </p>
+            <SimilarArtistsTable similarArtists={[]} callbackHandler={this.callbackHandler}></SimilarArtistsTable>
+            
             </div>
           </div>
         </div>

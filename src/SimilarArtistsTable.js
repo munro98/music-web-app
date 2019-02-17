@@ -40,7 +40,7 @@ class SimilarArtistsTable extends Component {
 
     render() {
 
-        let list = this.props.songs;
+        let list = this.props.similarArtists;
 
         let items = list.map( (val, i) =>
             <tr key={i}>
@@ -77,5 +77,5 @@ class SimilarArtistsTable extends Component {
 
 export default SimilarArtistsTable
 export {
-    VIEW_CALLBACK_ENUMS as SONG_TABLE_CB_ENUMS,
+    VIEW_CALLBACK_ENUMS as SIMILAR_ARTISTS_TABLE_CB_ENUMS,
   };
