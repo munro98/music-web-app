@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import './App.css';
 
+const LFM_API = process.env.REACT_APP_LFM_API;
 
 // list of all possible enums in child
 const VIEW_CALLBACK_ENUMS = {
@@ -25,27 +26,15 @@ class SongTable extends Component {
     }
 
     componentDidMount1() {
-            var settings = {
-                APIkey:		"abc",
-                ime:        null,
-                limit:		25,
-                cont:       null
-            };
-            var imeBenda = settings.ime.replace(/&/g, '%26').replace(/\+/g, '%2B');
-            /*
-            var url = "https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" 
-                      + imeBenda + 
-                      "&api_key=" 
-                      + settings.APIkey + 
-                      "&format=json&limit=" 
-                      + settings.limit;
-            */
            let url = "http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=Cher&api_key=YOUR_API_KEY&format=json"
+           let url2 = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=cher&api_key=" + LFM_API + "&format=json"
+           let url3 = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=cher&api_key=YOUR_API_KEY&format=json"
+           
             var tracks = [];
             var trimas = [];
             var out = [];
         
-            fetch(url).then(response => {
+            fetch(url2).then(response => {
                 return response.json();
               }).then(data => {
                 // Work with your JSON data here..
@@ -82,7 +71,7 @@ class SongTable extends Component {
                 </button>
                 </td>
                 <td>{val.name + " " + i}</td>
-                <td><a href="www">{val.artists[0]}</a></td>
+                <td></td>
             </tr>
 
         );
@@ -94,7 +83,7 @@ class SongTable extends Component {
                 <tr>
                     <th></th>
                     <th>Top Songs</th>
-                    <th>Artist</th>
+                    <th></th>
                 </tr>
                 {items}
                 </tbody>

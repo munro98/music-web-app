@@ -7,6 +7,9 @@ import {
   SONG_TABLE_CB_ENUMS,
 } from './SongTable';
 
+
+const LFM_API = process.env.REACT_APP_LFM_API;
+
 class App extends Component {
   constructor(props) {
     super(props)
@@ -17,7 +20,13 @@ class App extends Component {
       songIndex: 0,
       songDuration: 0,
       songCurrTime: 0,
-      songs : []
+      songs : [],
+      artistName: "",
+      artistBio: "",
+      artistTags: [],
+      artistImage: "",
+      artistSimilar: [],
+      artistTopSongs: []
     }
 
     //this.onPlayDown = this.onPlayDown.bind(this);
@@ -25,8 +34,40 @@ class App extends Component {
   }
 
   componentDidMount() {
-    let songs = [{name: "The Tunnel", artists: ["Snow Dayy"]}, {name: "One ft. Holly Drummond (Virtual Riot 2017 Remix)", artists: ["Submatik"]}];
-    this.setState({songs: songs});
+    let url = "http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=Cher&api_key=" + LFM_API + "&format=json"
+    /*
+    fetch(url).then(response => {
+        return response.json();
+      }).then(data => {
+        console.log(data);
+        let name = data.artist.name;
+        //console.log(name);
+        let bio = data.artist.bio.summary;
+        let tags = data.artist.tags.tag;
+        let image = data.artist.image[data.artist.image.length-1];
+        let similar = data.artist.similar.artist;
+        this.setState({artistName: name, artistBio: bio, artistTags: tags, artistImage: image, artistSimilar: similar});
+      }).catch(err => {
+        // What do when the request fails
+        this.setState({artistName: "Request Error"});
+        console.log('The request failed!!!! ' + err); 
+      });
+      */
+
+      let urlTopSongs = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=cher&api_key=" + LFM_API + "&limit=20&format=json"
+      fetch(urlTopSongs).then(response => {
+          return response.json();
+        }).then(data => {
+          console.log(data);
+          let top = data.toptracks.track;
+          this.setState({artistTopSongs: top});
+        }).catch(err => {
+          // What do when the request fails
+          this.setState({artistName: "Request Error"});
+          console.log('The request failed!!!! ' + err); 
+        });
+
+    //this.setState({songs: songs});
   }
 
   callbackHandler = (type, data) => {
@@ -64,16 +105,16 @@ class App extends Component {
       <div className="App" style={{height: "60px"}}>
         <header className="App-header">
           <img height="60px" src={logo} className="App-logo" alt="logo" />
-          <h1 style={{}}> WebAMuseek </h1> 
+          <h1 style={{}}>React Museek</h1> 
           
         </header>
         <div className="Content" style={{backgroundColor: "#282c34"}}>
           <div className="Top">
             <div className="Bio">
-            <h2 > Muzzy </h2>
+            <h2 > {this.state.artistName} </h2>
             Drum And Bass / Dubstep / Electronic / Drumstep / Dnb
               <p>
-              There are several artists under the name Muzzy. (1) Mustafa 'Muzzy' Alobaidi is a Dubstep/DNB artist from Hampshire, UK. He started getting recognition when he was only 14-15 years old. http://www.youtube.com/muzzy654 http://soundcloud.com/muzzydnb (2) Muzzy is musician living in Yunnan, China. Free tracks can be downloaded via Douban. www.douban.com/artist/Muzzy/ www.myspace.cn/muzzy (3) Muzzy Spends too much time playing in Garageband and not doing the dishes. Read more on Last.fm
+              {this.state.artistBio} 
               </p>
             </div>
             <div className="Player">
@@ -83,7 +124,7 @@ class App extends Component {
 
           <div className="Bot">
             <div className="SongTable">
-              <SongTable songs={this.state.songs} callbackHandler={this.callbackHandler}></SongTable>
+              <SongTable songs={this.state.artistTopSongs} callbackHandler={this.callbackHandler}></SongTable>
             </div>
             <div className="Similar">
               <p>

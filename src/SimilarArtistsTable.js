@@ -24,6 +24,10 @@ class SimilarArtistsTable extends Component {
         this.onClickArtist = this.onClickArtist.bind(this);
     }
 
+    componentDidMount() {
+
+    }
+
     onClickArtist(e) {
         let id = e.currentTarget.getAttribute('song_id');
         console.log("play " + e.currentTarget + " "+ id);
