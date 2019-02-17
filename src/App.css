@@ -29,3 +29,59 @@
     transform: rotate(360deg);
   }
 }
+
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;   
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%; 
+  background: rgb(255, 255, 255);
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: rgb(255, 255, 255);
+  cursor: pointer;
+}
+
+#songs {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  border-collapse: collapse;
+  
+  width: 100%;
+}
+
+#songs table {
+  padding: 10px;
+}
+
+#songs td, #songs th {
+  padding: 0px;
+  text-align: left;
+  border-bottom: 1px solid rgb(90, 90, 90);
+  color: rgb(255, 255, 255);
+}
+
+#songs a{
+  color: rgb(255, 255, 255);
+}
+
+#songs tr:hover {background-color: rgb(77, 77, 77);}

@@ -2,16 +2,72 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import SongTable from './SongTable';
+import { 
+  SONG_TABLE_CB_ENUMS,
+} from './SongTable';
+
 class App extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      songProgress: 0.0,
+      volume: 1.0,
+      isPlaying: false,
+      songIndex: 0,
+      songDuration: 0,
+      songCurrTime: 0,
+      songs : []
+    }
+
+    //this.onPlayDown = this.onPlayDown.bind(this);
+    //this.loadAnother = this.loadAnother.bind(this);
+  }
+
+  componentDidMount() {
+    let songs = [{name: "The Tunnel", artists: ["Snow Dayy"]}, {name: "One ft. Holly Drummond (Virtual Riot 2017 Remix)", artists: ["Submatik"]}];
+    this.setState({songs: songs});
+  }
+
+  callbackHandler = (type, data) => {
+    console.log("callbackHandler " + type)
+    switch(type) {
+      case SONG_TABLE_CB_ENUMS.PLAY:
+      console.log("play " + data.id)
+      this.onPlayFromTable(data.id);
+      break;
+      /*
+      case CALLBACK_ENUMS.PLAY:
+      // manipulate data if required
+      //this.props.callbackHandler(type, data);
+      console.log("play " + data)
+      this.onPlayDown();
+      break;
+    case CALLBACK_ENUMS.PREV:
+      this.onPrevDown();
+      break;
+    case CALLBACK_ENUMS.NEXT:
+      this.onNextDown();
+      break;
+    case CALLBACK_ENUMS.END:
+      this.onSongEnded();
+      break;
+    */
+    default:
+      // bubble up all other actions to parent
+      //this.props.callbackHandler(type, data);
+    }
+  }
+
   render() {
     return (
       <div className="App" style={{height: "60px"}}>
         <header className="App-header">
           <img height="60px" src={logo} className="App-logo" alt="logo" />
-          <h1 style={{}}> Web Muse </h1> 
+          <h1 style={{}}> WebAMuseek </h1> 
           
         </header>
-        <div className="Content">
+        <div className="Content" style={{backgroundColor: "#282c34"}}>
           <div className="Top">
             <div className="Bio">
             <h2 > Muzzy </h2>
@@ -21,17 +77,15 @@ class App extends Component {
               </p>
             </div>
             <div className="Player">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/71rSc6LXlSo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <iframe width="100%" src="https://www.youtube.com/embed/71rSc6LXlSo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
           </div>
 
           <div className="Bot">
-            <div className="Bio">
-              <p>
-                Edit <code>src/App.js</code> and save to reload.
-              </p>
+            <div className="SongTable">
+              <SongTable songs={this.state.songs} callbackHandler={this.callbackHandler}></SongTable>
             </div>
-            <div className="Player">
+            <div className="Similar">
               <p>
                 Edit <code>src/App.js</code> and save to reload.
               </p>
