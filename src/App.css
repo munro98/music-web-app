@@ -1,5 +1,5 @@
 .App {
-  text-align: center;
+  text-align: left;
 }
 
 .App-logo {
@@ -27,6 +27,19 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@media screen and (max-width: 800px) {
+  .Top{   
+    flex-direction: column;
+  }
+  .Bot{   
+    flex-direction: column;
   }
 }
 

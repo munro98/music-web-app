@@ -12,8 +12,7 @@ const divStyle = {
     width: "100%",
     height: "100%",
     bottom: "100px",
-    overflowY: "scroll"
-
+    //overflowY: "scroll"
 };
 
 const stylePlayerButton = {width: "40px", height: "40px", background: "transparent", border: "0", outline: "none"}
@@ -59,7 +58,7 @@ class SimilarArtistsTable extends Component {
         );
         return (
             <div style={divStyle}>
-            <table id="similar-artists">
+            <table id="songs">
                 <tbody>
                 <tr>
                     <th>Similar Artists</th>

@@ -13,7 +13,7 @@ const divStyle = {
     width: "100%",
     height: "100%",
     bottom: "100px",
-    overflowY: "scroll"
+    //overflowY: "scroll"
 
 };
 

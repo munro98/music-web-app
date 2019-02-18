@@ -104,7 +104,18 @@ class App extends Component {
     }
   }
 
+  onPlayFromTable() {
+    
+  }
+
   render() {
+
+    let tags = this.state.artistTags.map( (val, i) =>
+      <a key={i} href="www">
+      {val.name + " " + i}
+      </a>
+    );
+
     return (
       <div className="App" style={{height: "60px"}}>
         <header className="App-header">
@@ -113,31 +124,33 @@ class App extends Component {
           
         </header>
         <div className="Content" style={{backgroundColor: "#282c34"}}>
-          <div className="Top">
-            <div className="Bio">
+
+          <div className="Top" style={{display: "flex", flexWrap: "wrap"}}>
+            <div className="Bio" style={{flex: "50%", padding: "10px"}}>
             <h2 > {this.state.artistName} </h2>
+            <p style={{color: "rgb(240, 240, 240)"}}>
             Drum And Bass / Dubstep / Electronic / Drumstep / Dnb
-              <p>
+            </p>
+              <p style={{color: "rgb(240, 240, 240)"}}>
               {this.state.artistBio} 
+              aaaaaaaaa aaaaaa aaaaaaaa aaaaaaaaaaaa aaaaaaaaaaaaa aaaaaaaaaaaaaaaaa aaaaaaaaaa aaaaaaaaaaaaaa aaaaaaaaaaa aaaaaaaaaa
               </p>
             </div>
-            <div className="Player">
+            <div className="Player" style={{flex: "50%", padding: "10px"}}>
             <iframe width="100%" src="https://www.youtube.com/embed/71rSc6LXlSo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
           </div>
 
-          <div className="Bot">
-            <div className="SongTable">
+          <div className="Bot" style={{display: "flex", flexWrap: "wrap"}}>
+            <div className="SongTable" style={{flex: "50%", padding: "10px"}}>
               <SongTable songs={this.state.artistTopSongs} callbackHandler={this.callbackHandler}></SongTable>
             </div>
-            <div className="Similar">
+            <div className="Similar" style={{flex: "50%", padding: "10px"}}>
             <SimilarArtistsTable similarArtists={[]} callbackHandler={this.callbackHandler}></SimilarArtistsTable>
             
             </div>
           </div>
         </div>
-
-
       </div>
     );
   }
