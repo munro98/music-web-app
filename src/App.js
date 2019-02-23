@@ -7,12 +7,23 @@ import {
   SONG_TABLE_CB_ENUMS,
 } from './SongTable';
 
+import ControlBar from './ControlBar';
+import { 
+  ControlBar_CB_ENUMS,
+} from './ControlBar';
+
+import YTEmbeded from './YTEmbeded';
+import { 
+  YTEmbeded_CB_ENUMS,
+} from './YTEmbeded';
+
 import SimilarArtistsTable from './SimilarArtistsTable';
 import { 
   SIMILAR_ARTISTS_TABLE_CB_ENUMS,
 } from './SimilarArtistsTable';
 
 const LFM_API = process.env.REACT_APP_LFM_API;
+const YT_API = process.env.REACT_APP_YT_API;
 
 class App extends Component {
   constructor(props) {
@@ -30,8 +41,11 @@ class App extends Component {
       artistTags: [],
       artistImage: "",
       artistSimilar: [],
-      artistTopSongs: []
+      artistTopSongs: [],
+      ytId: "71rSc6LXlSo"
     }
+
+    this.ytPlayer = React.createRef();
 
     //this.onPlayDown = this.onPlayDown.bind(this);
     //this.loadAnother = this.loadAnother.bind(this);
@@ -39,7 +53,7 @@ class App extends Component {
 
   componentDidMount() {
     let url = "http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=Cher&api_key=" + LFM_API + "&format=json"
-    /*
+    ///*
     fetch(url).then(response => {
         return response.json();
       }).then(data => {
@@ -52,11 +66,10 @@ class App extends Component {
         let similar = data.artist.similar.artist;
         this.setState({artistName: name, artistBio: bio, artistTags: tags, artistImage: image, artistSimilar: similar});
       }).catch(err => {
-        // What do when the request fails
         this.setState({artistName: "Request Error"});
         console.log('The request failed!!!! ' + err); 
       });
-      */
+      //*/
 
       let urlTopSongs = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=cher&api_key=" + LFM_API + "&limit=20&format=json"
       fetch(urlTopSongs).then(response => {
@@ -66,20 +79,27 @@ class App extends Component {
           let top = data.toptracks.track;
           this.setState({artistTopSongs: top});
         }).catch(err => {
-          // What do when the request fails
           this.setState({artistName: "Request Error"});
           console.log('The request failed!!!! ' + err); 
         });
 
-    //this.setState({songs: songs});
   }
 
   callbackHandler = (type, data) => {
     console.log("callbackHandler " + type)
     switch(type) {
       case SONG_TABLE_CB_ENUMS.PLAY:
-      console.log("play " + data.id)
-      this.onPlayFromTable(data.id);
+      console.log("play " + data.songName)
+      
+      this.onPlayFromTable(data.songName);
+      break;
+      case ControlBar_CB_ENUMS.PLAY:
+      this.ytPlayer.current.playVideo();
+      // manipulate data if required
+      //this.props.callbackHandler(type, data);
+      console.log("play " + data)
+      
+      //this.onPlayDown();
       break;
       /*
       case CALLBACK_ENUMS.PLAY:
@@ -104,18 +124,38 @@ class App extends Component {
     }
   }
 
-  onPlayFromTable() {
-    
-  }
+  onPlayFromTable(songName) {
 
+    let imeBenda = this.state.artistName.replace(/&/g, '%26');
+    let imePesme = songName.replace(/&/g, '%26');
+    let url = "https://www.googleapis.com/youtube/v3/search?videoDefinition=any&part=snippet&videoEmbeddable=true&q="
+			  + imeBenda + "+" + imePesme + "&part=contentDetails&type=video&maxResults=10&key=" + YT_API;
+    fetch(url).then(response => {
+        return response.json();
+      }).then(data => {
+        console.log(data);
+        let vID = data.items[0].id.videoId;
+        console.log(vID);
+
+        this.ytPlayer.current.playNewVideo(vID)
+        //this.setState({ytId: vID});
+        //this.setState({artistTopSongs: top});
+      }).catch(err => {
+        this.setState({artistName: "YT Request Error"});
+        console.log('The request failed!!!! ' + err); 
+      });
+     //*/
+
+  }
+  
   render() {
 
     let tags = this.state.artistTags.map( (val, i) =>
-      <a key={i} href="www">
-      {val.name + " " + i}
+      <a key={i} style={{color: "rgb(240, 240, 240)"}} href="www">
+      {val.name + " "}
       </a>
     );
-
+    //Drum And Bass / Dubstep / Electronic / Drumstep / Dnb
     return (
       <div className="App" style={{height: "60px"}}>
         <header className="App-header">
@@ -126,31 +166,32 @@ class App extends Component {
         <div className="Content" style={{backgroundColor: "#282c34"}}>
 
           <div className="Top" style={{display: "flex", flexWrap: "wrap"}}>
-            <div className="Bio" style={{flex: "50%", padding: "10px"}}>
-            <h2 > {this.state.artistName} </h2>
+            <div className="Bio" style={{flex: "50%", padding: "16px"}}>
+            <h2 style={{color: "rgb(240, 240, 240)"}}> {this.state.artistName} </h2>
             <p style={{color: "rgb(240, 240, 240)"}}>
-            Drum And Bass / Dubstep / Electronic / Drumstep / Dnb
+            {tags}
             </p>
               <p style={{color: "rgb(240, 240, 240)"}}>
               {this.state.artistBio} 
-              aaaaaaaaa aaaaaa aaaaaaaa aaaaaaaaaaaa aaaaaaaaaaaaa aaaaaaaaaaaaaaaaa aaaaaaaaaa aaaaaaaaaaaaaa aaaaaaaaaaa aaaaaaaaaa
               </p>
             </div>
-            <div className="Player" style={{flex: "50%", padding: "10px"}}>
-            <iframe width="100%" src="https://www.youtube.com/embed/71rSc6LXlSo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div className="Player" style={{flex: "50%", padding: "16px"}}>
+              <YTEmbeded ref={this.ytPlayer} YTid={this.state.ytId} callbackHandler={this.callbackHandler}> </YTEmbeded>
+
             </div>
           </div>
 
           <div className="Bot" style={{display: "flex", flexWrap: "wrap"}}>
-            <div className="SongTable" style={{flex: "50%", padding: "10px"}}>
+            <div className="SongTable" style={{flex: "50%", padding: "16px"}}>
               <SongTable songs={this.state.artistTopSongs} callbackHandler={this.callbackHandler}></SongTable>
             </div>
-            <div className="Similar" style={{flex: "50%", padding: "10px"}}>
-            <SimilarArtistsTable similarArtists={[]} callbackHandler={this.callbackHandler}></SimilarArtistsTable>
+            <div className="Similar" style={{flex: "50%", padding: "16px"}}>
+            <SimilarArtistsTable similarArtists={this.state.artistSimilar} callbackHandler={this.callbackHandler}></SimilarArtistsTable>
             
             </div>
           </div>
         </div>
+        <ControlBar callbackHandler={this.callbackHandler}> </ControlBar>
       </div>
     );
   }
