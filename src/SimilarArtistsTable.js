@@ -29,10 +29,6 @@ class SimilarArtistsTable extends Component {
 
     onClickArtist(e) {
         let id = e.currentTarget.getAttribute('artist_list_ind');
-        console.log("play " + e.currentTarget + " "+ id);
-        this.props.callbackHandler(
-            VIEW_CALLBACK_ENUMS.CLICK,
-            {id : id});
     }
 
     render() {
@@ -40,7 +36,9 @@ class SimilarArtistsTable extends Component {
         let items = list.map( (val, i) =>
             <tr key={i}>
                 <td><img height="40px" src={val.image[val.image.length-1][Object.keys(val.image[val.image.length-1])[0]]} alt="artist" /></td>
-                <td><a href="www">{val.name + " " + i}</a></td>
+                <td><a href={
+                    "?artist="+val.url.split("/")[val.url.split("/").length-1]
+                    }>{val.name + " " + i}</a></td>
             </tr>
 
         );

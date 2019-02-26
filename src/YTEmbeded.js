@@ -62,6 +62,13 @@ class YTEmbeded extends Component {
     stopVideo() {
         this.player.stopVideo();
     }
+    setVolVideo() {
+        this.player.setVolume();
+    }
+    setSeekVideo() {
+        this.player.seekTo();
+    }
+
 
     onPlayerStateChange = (e) => {
         console.log(e);

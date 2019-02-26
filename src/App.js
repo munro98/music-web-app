@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import QueryString from 'query-string';
+
 import SongTable from './SongTable';
 import { 
   SONG_TABLE_CB_ENUMS,
@@ -22,6 +24,16 @@ import {
   SIMILAR_ARTISTS_TABLE_CB_ENUMS,
 } from './SimilarArtistsTable';
 
+/*
+Add serachbar for artists
+Add link for lastFM page
+Play next song when one is finished
+Make the < > do stuff
+
+fix terrible UI
+
+*/
+
 const LFM_API = process.env.REACT_APP_LFM_API;
 const YT_API = process.env.REACT_APP_YT_API;
 
@@ -35,7 +47,9 @@ class App extends Component {
       songIndex: 0,
       songDuration: 0,
       songCurrTime: 0,
-      songs : [],
+      activeArtistName: "None selected",
+      activeArtist: "None selected",
+      activeSongName: "None selected",
       artistName: "",
       artistBio: "",
       artistTags: [],
@@ -52,7 +66,16 @@ class App extends Component {
   }
 
   componentDidMount() {
-    let url = "http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=Cher&api_key=" + LFM_API + "&format=json"
+
+    const parsed = QueryString.parse(window.location.search);
+    console.log(parsed);
+
+    let artistParam;
+    if (parsed.artist) {
+      artistParam = parsed.artist;
+    }
+
+    let url = "http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=Cher&api_key=" + LFM_API + "&format=json" //C%C3%A9line+Dion
     ///*
     fetch(url).then(response => {
         return response.json();
@@ -98,8 +121,13 @@ class App extends Component {
       // manipulate data if required
       //this.props.callbackHandler(type, data);
       console.log("play " + data)
-      
       //this.onPlayDown();
+      break;
+      case ControlBar_CB_ENUMS.VOLUME_CHANGE:
+      this.ytPlayer.current.setVolVideo(data);
+      break;
+      case ControlBar_CB_ENUMS.SEEK_CHANGE:
+      this.ytPlayer.current.setVolVideo(data);
       break;
       /*
       case CALLBACK_ENUMS.PLAY:
@@ -138,14 +166,42 @@ class App extends Component {
         console.log(vID);
 
         this.ytPlayer.current.playNewVideo(vID)
+
+        if (true) {
+          this.setState({activeArtistName: this.state.artistName, activeSongName: songName});
+        }
+
         //this.setState({ytId: vID});
         //this.setState({artistTopSongs: top});
       }).catch(err => {
         this.setState({artistName: "YT Request Error"});
         console.log('The request failed!!!! ' + err); 
       });
-     //*/
 
+  }
+
+  searchArtist(str) {
+    let imePesme = str.replace(/&/g, '%26');
+    let url = "http://ws.audioscrobbler.com/2.0/?method=artist.search&artist=" + imePesme + "&api_key=" + LFM_API + "&limit=20&format=json"
+
+    let suggestions = [];
+    fetch(url).then(response => {
+        return response.json();
+      }).then(data => {
+        console.log(data);
+
+        /*
+        data.results.artistmatches.artist.foreach((artist) => {suggestions.push(artist.name)})
+        */
+
+      }).catch(err => {
+        console.log('The request failed!!!! ' + err); 
+      });
+
+  }
+
+  onSearchChange(e) {
+    console.log(e); 
   }
   
   render() {
@@ -155,12 +211,21 @@ class App extends Component {
       {val.name + " "}
       </a>
     );
-    //Drum And Bass / Dubstep / Electronic / Drumstep / Dnb
+
     return (
       <div className="App" style={{height: "60px"}}>
         <header className="App-header">
-          <img height="60px" src={logo} className="App-logo" alt="logo" />
-          <h1 style={{}}>React Museek</h1> 
+          
+          <img  height="60px" src={logo} style={{float: "left", marginTop: "auto", marginBottom: "auto"}} className="App-logo" alt="logo" />
+          <h1 style={{float: "left", margin: "0px", fontSize: "40px"}}>React Museek</h1>
+
+          <form autocomplete="off" action="/">
+          <div style={{float: "right", marginTop: "auto", marginBottom: "auto", marginLeft: "16px", marginRight: "16px"}} class="autocomplete">
+            <input style={{border: "none",fontSize: "17px", padding: "6px", marginTop: "auto", marginBottom: "auto"}} id="search" type="text" name="search" placeholder="Artist.." onChange={this.onSearchChange}></input>
+          </div>
+          <input type="submit"></input>
+          </form>
+
           
         </header>
         <div className="Content" style={{backgroundColor: "#282c34"}}>
@@ -191,7 +256,7 @@ class App extends Component {
             </div>
           </div>
         </div>
-        <ControlBar callbackHandler={this.callbackHandler}> </ControlBar>
+        <ControlBar callbackHandler={this.callbackHandler} activeArtist={this.state.activeArtist} activeArtistName={this.state.activeArtistName} activeSongName={this.state.activeSongName}> </ControlBar>
       </div>
     );
   }

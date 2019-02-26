@@ -113,11 +113,12 @@ class ControlBar extends Component {
             </div>
 
             <div style={{float : "left", margin: "16px", color: "rgb(240, 240, 240)"}}>
-            <span style={{color: "rgb(240, 240, 240)"}}>Playlist</span>
+            <span > <a style={{color: "rgb(200, 200, 200)"}} href={
+                    this.props.activeArtist === "" ? "/" : "?artist="+this.props.activeArtist
+                    }> {this.props.activeArtistName} </a> </span>
             <br></br>
-            <span style={{color: "rgb(240, 240, 240)"}}>Name of song</span>
-            <br></br>
-            <span style={{color: "rgb(200, 200, 200)"}}>Artist</span>
+            <span style={{color: "rgb(240, 240, 240)"}}>{this.props.activeSongName}</span>
+            
             
             </div>
             
