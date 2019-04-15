@@ -11,6 +11,9 @@ const VIEW_CALLBACK_ENUMS = {
     NEXT: 'ControlBar/NEXT',
     PREV: 'ControlBar/PREV',
     END: 'ControlBar/END',
+    VOLUME_CHANGE: 'ControlBar/VOLUME_CHANGE',
+    SEEK_CHANGE: 'ControlBar/SEEK_CHANGE',
+    SEEK_UP: 'ControlBar/SEEK_UP'
   };
 
 const styleFlex = {display: "flex",
@@ -32,10 +35,6 @@ const styleDiv2 = {
     background: "transparent",
     flex : "70%",
     width : "100%",
-};
-
-const albumStyle = {
-    marginTop: "0px"
 };
 
 const timeElapsedSyle = {
@@ -67,13 +66,26 @@ class ControlBar extends Component {
 
     onSongSeekChange(e) {
         let newProgress = e.target.value/10000.0;
-        this.setState({songProgress : newProgress});
-        console.log(newProgress);
+        //this.setState({songProgress : newProgress});
+        //console.log(newProgress);
+        this.props.callbackHandler(
+            VIEW_CALLBACK_ENUMS.SEEK_CHANGE,
+            {value : newProgress});
+    }
+
+    onSongSeekUp(e) {
+        let newProgress = e.target.value/10000.0;
+        this.props.callbackHandler(
+            VIEW_CALLBACK_ENUMS.SEEK_SEEK_UP,
+            {value : newProgress});
     }
 
     onVolumeChange(e) {
         let newProgress = e.target.value/10000.0;
-        this.setState({volume : newProgress});
+        this.props.callbackHandler(
+            VIEW_CALLBACK_ENUMS.VOLUME_CHANGE,
+            {value : newProgress});
+        //this.setState({volume : newProgress});
     }
 
     onPlayDown(e) {
@@ -93,6 +105,14 @@ class ControlBar extends Component {
             VIEW_CALLBACK_ENUMS.NEXT,
             "");
     }
+
+    secondsToMMSS(s) {
+        s = Math.floor(s);
+        let m = Math.floor(s / 60);
+        let secs = Math.floor(s % 60);
+        return ""+m+":"+secs;
+    }
+
     /*
             <img 
             style={albumStyle}
@@ -121,15 +141,10 @@ class ControlBar extends Component {
             
             
             </div>
-            
-
             </div>
-            
-            
             </div>
             <div style={styleDiv}> 
                 <div style={{ width: "240px",height: "50px",marginTop: "16px", marginLeft: "auto", marginRight: "auto", columnCount: 5/*, backgroundColor: "rgb(255, 0, 0)"*/}}> 
-                    <div><center>1</center></div>
                     <div><center>
                     
                         <button id="play-button" style={stylePlayerButton} onClick={this.onPrevDown}>
@@ -160,13 +175,12 @@ class ControlBar extends Component {
                     </button>
                         
                     </center></div>
-                    <div><center>5</center></div>
                 </div>
             
                 
                 <div style={{ height: "50px", marginTop: "0px", marginLeft: "auto", marginRight: "auto"/*, backgroundColor: "rgb(255, 0, 0)"*/}}> 
-                    <div style={{ marginTop: "2px", width: "44px", float: "left", fontFamily: "monospace, monospace", background: "transparent"}}>12:12</div>
-                    <div style={{ marginTop: "2px", width: "44px", float: "right", fontFamily: "monospace, monospace", background: "transparent"}}>12:12</div>
+                    <div style={{ marginTop: "2px", width: "44px", float: "left", fontFamily: "monospace, monospace", background: "transparent"}}>{this.secondsToMMSS(this.props.time)}</div>
+                    <div style={{ marginTop: "2px", width: "44px", float: "right", fontFamily: "monospace, monospace", background: "transparent"}}>{this.secondsToMMSS(this.props.duration)}</div>
                     <div style={{marginLeft: "48px", marginRight: "50px"}}><Slider onChange={this.onSongSeekChange}></Slider></div>
                 </div>
 

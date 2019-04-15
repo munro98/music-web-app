@@ -31,7 +31,7 @@ class SongTable extends Component {
 
         this.props.callbackHandler(
             VIEW_CALLBACK_ENUMS.PLAY,
-            {songName : songName});
+            {songName : songName, songID : id});
     }
 
     render() {

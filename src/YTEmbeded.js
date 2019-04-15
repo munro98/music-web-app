@@ -66,12 +66,22 @@ class YTEmbeded extends Component {
     setVolVideo() {
         this.player.setVolume();
     }
-    setSeekVideo() {
-        this.player.seekTo();
+
+    setSeekVideo(f, allowSeekAhead) {
+        let seconds = f * this.player.getDuration();
+        this.player.seekTo(seconds, allowSeekAhead);
     }
 
     getDuration() {
         return this.player.getDuration();
+    }
+
+    getCurrentTime() {
+        return this.player.getCurrentTime();
+    }
+
+    getVolume() {
+        return this.player.getVolume();
     }
 
 
@@ -83,9 +93,14 @@ class YTEmbeded extends Component {
         //
         if (e.data === 1) {
             //console.log("playing");
+            this.props.callbackHandler(
+                VIEW_CALLBACK_ENUMS.PLAY,
+                {duration: this.getDuration(), time : this.getCurrentTime()});
 
         } else if (e.data === 2) {
-            //console.log("pause");
+            this.props.callbackHandler(
+                VIEW_CALLBACK_ENUMS.PLAY,
+                {duration: this.getDuration(), time : this.getCurrentTime()});
 
         } else if (e.data === 0) {
             //console.log("ended");

@@ -25,12 +25,7 @@ import {
 } from './SimilarArtistsTable';
 
 /*
-Add link for lastFM page
-Play next song when one is finished
-Make the < > do stuff
-
-fix terrible UI
-
+fix control bar position
 */
 
 const LFM_API = process.env.REACT_APP_LFM_API;
@@ -51,6 +46,7 @@ class App extends Component {
       activeSongName: "None selected",
       artistName: "",
       artistBio: "",
+      artistURL: "",
       artistTags: [],
       artistImage: "",
       artistSimilar: [],
@@ -91,9 +87,10 @@ class App extends Component {
         //console.log(name);
         let bio = data.artist.bio.summary;
         let tags = data.artist.tags.tag;
-        let image = data.artist.image[data.artist.image.length-1];
+        let image = data.artist.image;//[data.artist.image.length-1];
+        let url = data.artist.url;
         let similar = data.artist.similar.artist;
-        this.setState({artistName: name, artistBio: bio, artistTags: tags, artistImage: image, artistSimilar: similar});
+        this.setState({artistName: name, artistURL: url, artistBio: bio, artistTags: tags, artistImage: image, artistSimilar: similar});
       }).catch(err => {
         this.setState({artistName: "Request Error"});
         console.log('The request failed!!!! ' + err); 
@@ -112,6 +109,18 @@ class App extends Component {
           console.log('The request failed!!!! ' + err); 
         });
 
+        let self = this;
+        setInterval(function()  {
+          /*
+          if (self.ytPlayer && self.ytPlayer.current) {
+            self.setState({songCurrTime: self.ytPlayer.current.getCurrentTime()});
+            console.log(self.ytPlayer.current.getCurrentTime());
+          }
+        
+        */
+      }
+        ,100);
+
   }
 
   callbackHandler = (type, data) => {
@@ -119,22 +128,65 @@ class App extends Component {
     switch(type) {
       case SONG_TABLE_CB_ENUMS.PLAY:
       console.log("play " + data.songName)
-      
+
+      this.setState({songIndex : data.songId});
       this.onPlayFromTable(data.songName);
+
       break;
       case ControlBar_CB_ENUMS.PLAY:
-      this.ytPlayer.current.playVideo();
-      // manipulate data if required
+      //this.ytPlayer.current.playVideo();
       //this.props.callbackHandler(type, data);
-      console.log("play " + data)
+      //console.log("play " + data)
+      if (this.state.songIndex <= this.state.artistTopSongs.length) {
+        this.onPlayFromTable(this.state.artistTopSongs[this.state.songIndex].name);
+      }
       //this.onPlayDown();
       break;
+      case ControlBar_CB_ENUMS.PREV:
+      if (this.state.songIndex > 1) {
+        let newI = this.state.songIndex - 1;
+          this.setState({songIndex : newI});
+          this.onPlayFromTable(this.state.artistTopSongs[this.state.songIndex].name);
+      } else {
+          this.onPlayFromTable(this.state.artistTopSongs[this.state.songIndex].name);
+      }
+      break;
+      case ControlBar_CB_ENUMS.NEXT:
+      if (this.state.songIndex < this.state.artistTopSongs.length) {
+          let newI = this.state.songIndex + 1;
+          this.setState({songIndex : newI});
+          this.onPlayFromTable(this.state.artistTopSongs[this.state.songIndex].name);
+      }
+      break;
+
       case ControlBar_CB_ENUMS.VOLUME_CHANGE:
-      this.ytPlayer.current.setVolVideo(data);
+      this.ytPlayer.current.setVolVideo(data.value);
       break;
       case ControlBar_CB_ENUMS.SEEK_CHANGE:
-      this.ytPlayer.current.setVolVideo(data);
+      //this.ytPlayer.current.setVolVideo(data);
+      this.ytPlayer.current.setSeekVideo(data.value, false)
       break;
+      case ControlBar_CB_ENUMS.SEEK_UP:
+      this.ytPlayer.current.setSeekVideo(data.value, true)
+      break;
+      
+      case YTEmbeded_CB_ENUMS.END:
+        if (this.state.songIndex < this.state.artistTopSongs.length) {
+          let newI = this.state.songIndex + 1;
+          this.setState({songIndex : newI});
+          
+          this.onPlayFromTable(this.state.artistTopSongs[this.state.songIndex].name);
+        }
+      break;
+      case YTEmbeded_CB_ENUMS.PLAY:
+        this.setState({songDuration: data.duration, songCurrTime: data.time, isPlaying: true});
+      break;
+      case YTEmbeded_CB_ENUMS.PAUSE:
+        this.setState({songDuration: data.duration, songCurrTime: data.time, isPlaying: false});
+      break;
+
+
+      
       /*
       case CALLBACK_ENUMS.PLAY:
       // manipulate data if required
@@ -277,6 +329,8 @@ class App extends Component {
       </a>
     );
 
+    // let val = this.state.artistImage;
+    // <img src={val.image[val.image.length-1][Object.keys(val.image[val.image.length-1])[0]]} alt="artist"/>
     return (
       <div className="App" style={{height: "60px"}}>
         <header className="App-header">
@@ -299,9 +353,11 @@ class App extends Component {
           <div className="Top" style={{display: "flex", flexWrap: "wrap"}}>
             <div className="Bio" style={{flex: "50%", padding: "16px"}}>
             <h2 style={{color: "rgb(240, 240, 240)"}}> {this.state.artistName} </h2>
+            <a style={{color: "rgb(240, 240, 240)"}} href={this.state.artistURL}>LastFM Link</a>
             <p style={{color: "rgb(240, 240, 240)"}}>
             {tags}
             </p>
+            
               <p style={{color: "rgb(240, 240, 240)"}}>
               {this.state.artistBio} 
               </p>
@@ -322,7 +378,7 @@ class App extends Component {
             </div>
           </div>
         </div>
-        <ControlBar callbackHandler={this.callbackHandler} activeArtist={this.state.activeArtist} activeArtistName={this.state.activeArtistName} activeSongName={this.state.activeSongName}> </ControlBar>
+        <ControlBar callbackHandler={this.callbackHandler} activeArtist={this.state.activeArtist} activeArtistName={this.state.activeArtistName} activeSongName={this.state.activeSongName} duration={this.state.songDuration} time={this.state.songCurrTime}> </ControlBar>
       </div>
     );
   }
