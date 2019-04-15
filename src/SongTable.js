@@ -46,7 +46,7 @@ class SongTable extends Component {
                     </svg>
                 </button>
                 </td>
-                <td>{val.name + " " + i}</td>
+                <td>{i + "  " + val.name }</td>
                 <td></td>
             </tr>
         );

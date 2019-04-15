@@ -25,7 +25,6 @@ import {
 } from './SimilarArtistsTable';
 
 /*
-Add serachbar for artists
 Add link for lastFM page
 Play next song when one is finished
 Make the < > do stuff
@@ -41,12 +40,12 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      songProgress: 0.0,
       volume: 1.0,
       isPlaying: false,
       songIndex: 0,
       songDuration: 0,
       songCurrTime: 0,
+      songProgress: 0.0,
       activeArtistName: "None selected",
       activeArtist: "None selected",
       activeSongName: "None selected",
@@ -56,13 +55,20 @@ class App extends Component {
       artistImage: "",
       artistSimilar: [],
       artistTopSongs: [],
+      suggestions: [],
       ytId: "71rSc6LXlSo"
     }
 
     this.ytPlayer = React.createRef();
+    this.currentFocus = undefined;
+    //this.suggestions = ["aaaaa","bbbbb","ccccc"];
 
     //this.onPlayDown = this.onPlayDown.bind(this);
     //this.loadAnother = this.loadAnother.bind(this);
+    this.onSearchChange = this.onSearchChange.bind(this);
+    this.searchArtist = this.searchArtist.bind(this);
+    this.closeAllLists = this.closeAllLists.bind(this);
+    this.addActive = this.addActive.bind(this)
   }
 
   componentDidMount() {
@@ -70,12 +76,12 @@ class App extends Component {
     const parsed = QueryString.parse(window.location.search);
     console.log(parsed);
 
-    let artistParam;
-    if (parsed.artist) {
-      artistParam = parsed.artist;
+    let artistParam = "cher";
+    if (parsed.search) {
+      artistParam = parsed.search;
     }
 
-    let url = "http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=Cher&api_key=" + LFM_API + "&format=json" //C%C3%A9line+Dion
+    let url = "http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=" + artistParam + "&api_key=" + LFM_API + "&format=json" //C%C3%A9line+Dion
     ///*
     fetch(url).then(response => {
         return response.json();
@@ -94,7 +100,7 @@ class App extends Component {
       });
       //*/
 
-      let urlTopSongs = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=cher&api_key=" + LFM_API + "&limit=20&format=json"
+      let urlTopSongs = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" + artistParam + "&api_key=" + LFM_API + "&limit=20&format=json"
       fetch(urlTopSongs).then(response => {
           return response.json();
         }).then(data => {
@@ -190,9 +196,10 @@ class App extends Component {
       }).then(data => {
         console.log(data);
 
-        /*
-        data.results.artistmatches.artist.foreach((artist) => {suggestions.push(artist.name)})
-        */
+        ///*
+        data.results.artistmatches.artist.forEach((artist) => {suggestions.push(artist.name)})
+        this.setState({suggestions: suggestions});
+        //*/
 
       }).catch(err => {
         console.log('The request failed!!!! ' + err); 
@@ -201,8 +208,66 @@ class App extends Component {
   }
 
   onSearchChange(e) {
-    console.log(e); 
+    console.log(e.currentTarget.value);//koan sound
+    this.searchArtist(e.currentTarget.value);
+
+    let a, b, i, val = e.currentTarget.value.toLowerCase();
+    let inputEl = e.currentTarget;
+    let self = this;
+      /*close any already open lists of autocompleted values*/
+      this.closeAllLists();
+      if (!val) { return false;}
+      this.currentFocus = -1;
+
+      a = document.createElement("DIV");
+      a.setAttribute("id", "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      e.currentTarget.parentNode.appendChild(a);
+      for (i = 0; i < this.state.suggestions.length; i++) {
+        if (this.state.suggestions[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+
+          b = document.createElement("DIV");
+
+          b.innerHTML = "<strong>" + this.state.suggestions[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += this.state.suggestions[i].substr(val.length);
+
+          b.innerHTML += "<input type='hidden' value='" + this.state.suggestions[i] + "'>";
+
+              b.addEventListener("click", function(e) {
+                inputEl.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,*/
+              self.closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+
+
   }
+
+  addActive(x) {
+
+    if (!x) return false;
+    this.removeActive(x);
+    if (this.currentFocus >= x.length) this.currentFocus = 0;
+    if (this.currentFocus < 0) this.currentFocus = (x.length - 1);
+    x[this.currentFocus].classList.add("autocomplete-active");
+  }
+  removeActive(x) {
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+
+  closeAllLists(elmnt) {
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != document.getElementById("search")) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+  }
+
   
   render() {
 
@@ -222,8 +287,9 @@ class App extends Component {
           <form autocomplete="off" action="/">
           <div style={{float: "right", marginTop: "auto", marginBottom: "auto", marginLeft: "16px", marginRight: "16px"}} class="autocomplete">
             <input style={{border: "none",fontSize: "17px", padding: "6px", marginTop: "auto", marginBottom: "auto"}} id="search" type="text" name="search" placeholder="Artist.." onChange={this.onSearchChange}></input>
+            <input style={{border: "none",fontSize: "17px", padding: "6px", marginTop: "auto", marginBottom: "auto"}} type="submit" value="Search"></input>
           </div>
-          <input type="submit"></input>
+          
           </form>
 
           

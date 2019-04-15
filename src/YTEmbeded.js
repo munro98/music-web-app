@@ -17,6 +17,7 @@ class YTEmbeded extends Component {
         super(props)
 
         this.playVideo = this.playVideo.bind(this);
+        this.onSongEnded = this.onSongEnded.bind(this);
     }
 
     componentDidMount() {
@@ -69,12 +70,28 @@ class YTEmbeded extends Component {
         this.player.seekTo();
     }
 
+    getDuration() {
+        return this.player.getDuration();
+    }
+
 
     onPlayerStateChange = (e) => {
-        console.log(e);
-        if (typeof this.props.onStateChange === 'function') {
-            this.props.onStateChange(e)
+        console.log(e.data);
+        //if (typeof this.props.onStateChange === 'function') {
+        //    this.props.onStateChange(e)
+        //}
+        //
+        if (e.data === 1) {
+            //console.log("playing");
+
+        } else if (e.data === 2) {
+            //console.log("pause");
+
+        } else if (e.data === 0) {
+            //console.log("ended");
+            this.onSongEnded();
         }
+
     }
 
     onSongEnded() {
